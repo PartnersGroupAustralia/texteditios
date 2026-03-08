@@ -12,6 +12,7 @@ nonisolated enum TextProcessingService: Sendable {
         case .sortAlphabetical: sortAlphabetical(text, ascending: step.ascending)
         case .sortByLength: sortByLength(text, ascending: step.ascending)
         case .sortByColumn: sortByColumn(text, column: step.columnIndex, delimiter: step.delimiter, ascending: step.ascending)
+        case .sortByColumnLength: sortByColumnLength(text, column: step.columnIndex, delimiter: step.delimiter, ascending: step.ascending)
         case .replaceText: replaceText(text, search: step.searchText, replacement: step.replaceText, useWildcard: step.useWildcard)
         case .removeText: replaceText(text, search: step.searchText, replacement: "", useWildcard: step.useWildcard)
         case .extractEmails: extractEmails(text)
@@ -109,6 +110,19 @@ nonisolated enum TextProcessingService: Sendable {
             return ascending
                 ? valA.localizedCaseInsensitiveCompare(valB) == .orderedAscending
                 : valA.localizedCaseInsensitiveCompare(valB) == .orderedDescending
+        }
+        return sorted.joined(separator: "\n")
+    }
+
+    static func sortByColumnLength(_ text: String, column: Int, delimiter: String, ascending: Bool) -> String {
+        guard !delimiter.isEmpty else { return text }
+        let lines = text.components(separatedBy: "\n")
+        let sorted = lines.sorted { a, b in
+            let colsA = a.components(separatedBy: delimiter)
+            let colsB = b.components(separatedBy: delimiter)
+            let lenA = column < colsA.count ? colsA[column].trimmingCharacters(in: .whitespaces).count : 0
+            let lenB = column < colsB.count ? colsB[column].trimmingCharacters(in: .whitespaces).count : 0
+            return ascending ? lenA < lenB : lenA > lenB
         }
         return sorted.joined(separator: "\n")
     }

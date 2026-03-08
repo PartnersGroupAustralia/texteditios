@@ -247,6 +247,22 @@ struct AddStepSheet: View {
                     .pickerStyle(.segmented)
                 }
 
+            case .sortByColumnLength:
+                Section("Column Settings") {
+                    TextField("Delimiter", text: $delimiter)
+                        .font(.system(.body, design: .monospaced))
+                    Picker("Column", selection: $columnIndex) {
+                        ForEach(0..<20, id: \.self) { i in
+                            Text("Column \(i + 1)").tag(i)
+                        }
+                    }
+                    Picker("Direction", selection: $ascending) {
+                        Text("Shortest First").tag(true)
+                        Text("Longest First").tag(false)
+                    }
+                    .pickerStyle(.segmented)
+                }
+
             case .sortByColumn:
                 Section("Column Settings") {
                     TextField("Delimiter", text: $delimiter)

@@ -9,6 +9,7 @@ nonisolated enum StepType: String, Codable, Sendable, CaseIterable {
     case sortAlphabetical
     case sortByLength
     case sortByColumn
+    case sortByColumnLength
     case replaceText
     case removeText
     case extractEmails
@@ -34,6 +35,7 @@ nonisolated enum StepType: String, Codable, Sendable, CaseIterable {
         case .sortAlphabetical: "Sort Alphabetically"
         case .sortByLength: "Sort by Length"
         case .sortByColumn: "Sort by Column"
+        case .sortByColumnLength: "Sort by Column Length"
         case .replaceText: "Find & Replace"
         case .removeText: "Remove All Instances"
         case .extractEmails: "Extract Emails"
@@ -61,6 +63,7 @@ nonisolated enum StepType: String, Codable, Sendable, CaseIterable {
         case .sortAlphabetical: "textformat.abc"
         case .sortByLength: "ruler"
         case .sortByColumn: "tablecells"
+        case .sortByColumnLength: "ruler"
         case .replaceText: "arrow.left.arrow.right"
         case .removeText: "xmark.circle"
         case .extractEmails: "envelope"
@@ -81,7 +84,7 @@ nonisolated enum StepType: String, Codable, Sendable, CaseIterable {
     var category: StepCategory {
         switch self {
         case .deduplicate, .trimLines, .removeEmptyLines, .fixPasswordsInColumn: .clean
-        case .sortAlphabetical, .sortByLength, .sortByColumn, .sortByEmail: .sort
+        case .sortAlphabetical, .sortByLength, .sortByColumn, .sortByColumnLength, .sortByEmail: .sort
         case .addPrefix, .addSuffix, .removePrefix, .removeSuffix: .prefixSuffix
         case .replaceText, .removeText, .removeBeforeSymbol, .removeAfterSymbol: .findReplace
         case .extractEmails: .extract
@@ -114,7 +117,7 @@ nonisolated enum StepCategory: String, Sendable, CaseIterable {
     }
 }
 
-nonisolated struct ProcessingStep: Codable, Identifiable, Sendable, Hashable {
+nonisolated struct ProcessingStep: Identifiable, Sendable, Hashable, Codable {
     let id: UUID
     let type: StepType
     var searchText: String
@@ -162,6 +165,29 @@ nonisolated struct ProcessingStep: Codable, Identifiable, Sendable, Hashable {
         self.clearOnly = clearOnly
     }
 
+    nonisolated init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        type = try container.decode(StepType.self, forKey: .type)
+        searchText = try container.decodeIfPresent(String.self, forKey: .searchText) ?? ""
+        replaceText = try container.decodeIfPresent(String.self, forKey: .replaceText) ?? ""
+        prefix = try container.decodeIfPresent(String.self, forKey: .prefix) ?? ""
+        suffix = try container.decodeIfPresent(String.self, forKey: .suffix) ?? ""
+        symbol = try container.decodeIfPresent(String.self, forKey: .symbol) ?? ""
+        columnIndex = try container.decodeIfPresent(Int.self, forKey: .columnIndex) ?? 0
+        delimiter = try container.decodeIfPresent(String.self, forKey: .delimiter) ?? ","
+        ascending = try container.decodeIfPresent(Bool.self, forKey: .ascending) ?? true
+        strings = try container.decodeIfPresent([String].self, forKey: .strings) ?? []
+        useWildcard = try container.decodeIfPresent(Bool.self, forKey: .useWildcard) ?? false
+        exceptions = try container.decodeIfPresent([String].self, forKey: .exceptions) ?? []
+        clearOnly = try container.decodeIfPresent(Bool.self, forKey: .clearOnly) ?? false
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, type, searchText, replaceText, prefix, suffix, symbol
+        case columnIndex, delimiter, ascending, strings, useWildcard, exceptions, clearOnly
+    }
+
     var summary: String {
         switch type {
         case .deduplicate: "Remove duplicate lines"
@@ -186,6 +212,7 @@ nonisolated struct ProcessingStep: Codable, Identifiable, Sendable, Hashable {
         case .trimLines: "Trim whitespace"
         case .removeEmptyLines: "Remove empty lines"
         case .fixPasswordsInColumn: "Fix passwords in column \(columnIndex + 1)"
+        case .sortByColumnLength: "Sort by length of column \(columnIndex + 1) (\(ascending ? "short first" : "long first"))"
         }
     }
 }
