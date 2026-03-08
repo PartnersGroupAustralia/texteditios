@@ -14,6 +14,7 @@ nonisolated enum StepType: String, Codable, Sendable, CaseIterable {
     case extractEmails
     case sortByEmail
     case removeBeforeSymbol
+    case removeAfterSymbol
     case removeDuplicatesContaining
     case removeLinesContaining
     case removeLinesNotContaining
@@ -38,6 +39,7 @@ nonisolated enum StepType: String, Codable, Sendable, CaseIterable {
         case .extractEmails: "Extract Emails"
         case .sortByEmail: "Sort by Email"
         case .removeBeforeSymbol: "Remove Before Symbol"
+        case .removeAfterSymbol: "Remove After Symbol"
         case .removeDuplicatesContaining: "Dedup Lines Containing"
         case .removeLinesContaining: "Remove Lines Containing"
         case .removeLinesNotContaining: "Remove Lines Not Containing"
@@ -64,6 +66,7 @@ nonisolated enum StepType: String, Codable, Sendable, CaseIterable {
         case .extractEmails: "envelope"
         case .sortByEmail: "at"
         case .removeBeforeSymbol: "scissors"
+        case .removeAfterSymbol: "scissors"
         case .removeDuplicatesContaining: "doc.on.doc"
         case .removeLinesContaining: "line.3.horizontal.decrease"
         case .removeLinesNotContaining: "line.3.horizontal.decrease.circle"
@@ -80,7 +83,7 @@ nonisolated enum StepType: String, Codable, Sendable, CaseIterable {
         case .deduplicate, .trimLines, .removeEmptyLines, .fixPasswordsInColumn: .clean
         case .sortAlphabetical, .sortByLength, .sortByColumn, .sortByEmail: .sort
         case .addPrefix, .addSuffix, .removePrefix, .removeSuffix: .prefixSuffix
-        case .replaceText, .removeText, .removeBeforeSymbol: .findReplace
+        case .replaceText, .removeText, .removeBeforeSymbol, .removeAfterSymbol: .findReplace
         case .extractEmails: .extract
         case .removeDuplicatesContaining, .removeLinesContaining, .removeLinesNotContaining, .removeLinesNoSymbolBetweenDelimiters, .removeLinesNoSymbolInColumn: .filterLines
         }
@@ -174,6 +177,7 @@ nonisolated struct ProcessingStep: Codable, Identifiable, Sendable, Hashable {
         case .extractEmails: "Extract email addresses"
         case .sortByEmail: "Sort lines by email"
         case .removeBeforeSymbol: "Remove before \"\(symbol)\""
+        case .removeAfterSymbol: "Remove after \"\(symbol)\""
         case .removeDuplicatesContaining: "Dedup lines with \"\(searchText)\""
         case .removeLinesContaining: "\(clearOnly ? "Clear" : "Remove") lines with \(strings.count) pattern(s)\(exceptions.isEmpty ? "" : " (\(exceptions.count) exception(s))")"
         case .removeLinesNotContaining: "Keep lines with \(strings.count) pattern(s)\(exceptions.isEmpty ? "" : " (\(exceptions.count) exception(s))")"

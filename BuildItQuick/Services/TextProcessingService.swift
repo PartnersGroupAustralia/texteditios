@@ -17,6 +17,7 @@ nonisolated enum TextProcessingService: Sendable {
         case .extractEmails: extractEmails(text)
         case .sortByEmail: sortByEmail(text, ascending: step.ascending)
         case .removeBeforeSymbol: removeBeforeSymbol(text, symbol: step.symbol)
+        case .removeAfterSymbol: removeAfterSymbol(text, symbol: step.symbol)
         case .removeDuplicatesContaining: removeDuplicatesContaining(text, search: step.searchText, useWildcard: step.useWildcard)
         case .removeLinesContaining: removeLinesContaining(text, strings: step.strings, useWildcard: step.useWildcard, exceptions: step.exceptions, clearOnly: step.clearOnly)
         case .removeLinesNotContaining: removeLinesNotContaining(text, strings: step.strings, useWildcard: step.useWildcard, exceptions: step.exceptions)
@@ -162,6 +163,16 @@ nonisolated enum TextProcessingService: Sendable {
             .map { line in
                 guard let range = line.range(of: symbol, options: .caseInsensitive) else { return line }
                 return String(line[range.upperBound...])
+            }
+            .joined(separator: "\n")
+    }
+
+    static func removeAfterSymbol(_ text: String, symbol: String) -> String {
+        guard !symbol.isEmpty else { return text }
+        return text.components(separatedBy: "\n")
+            .map { line in
+                guard let range = line.range(of: symbol, options: .caseInsensitive) else { return line }
+                return String(line[..<range.lowerBound])
             }
             .joined(separator: "\n")
     }

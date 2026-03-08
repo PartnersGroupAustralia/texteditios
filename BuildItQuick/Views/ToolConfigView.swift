@@ -120,6 +120,15 @@ struct ToolConfigView: View {
                         .foregroundStyle(.secondary)
                 }
 
+            case .removeAfterSymbol:
+                Section("Symbol") {
+                    TextField("Enter symbol (e.g. @ : |)", text: $symbolText)
+                        .font(.system(.body, design: .monospaced))
+                    Text("Removes all text after this symbol in each line (case insensitive)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
             case .removeDuplicatesContaining:
                 Section("String") {
                     TextField("Lines containing this string", text: $searchText)
@@ -460,7 +469,7 @@ struct ToolConfigView: View {
             !searchText.isEmpty
         case .removeText, .removeDuplicatesContaining:
             !searchText.isEmpty
-        case .removeBeforeSymbol:
+        case .removeBeforeSymbol, .removeAfterSymbol:
             !symbolText.isEmpty
         case .removeLinesContaining, .removeLinesNotContaining:
             filterStrings.contains { !$0.isEmpty }
