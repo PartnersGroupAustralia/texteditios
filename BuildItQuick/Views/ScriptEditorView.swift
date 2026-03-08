@@ -279,7 +279,7 @@ struct AddStepSheet: View {
                         .font(.system(.body, design: .monospaced))
                 }
 
-            case .removeBeforeSymbol:
+            case .removeBeforeSymbol, .removeAfterSymbol:
                 Section("Symbol") {
                     TextField("Symbol (e.g. @ : |)", text: $symbolText)
                         .font(.system(.body, design: .monospaced))
